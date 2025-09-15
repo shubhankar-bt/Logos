@@ -1,0 +1,592 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+
+
+
+
+
+// src/theme/palette.js
+
+// A helper function to create a semi-transparent color for glass effects
+const getGlassBackgroundColor = (color, opacity) => {
+  const alpha = Math.round(opacity * 255).toString(16);
+  return `${color}${alpha}`;
+};
+
+// M3-inspired color tokens
+const lightPalette = {
+  primary: {
+    main: '#6750A4', // Primary
+    contrastText: '#FFFFFF',
+  },
+  secondary: {
+    main: '#625B71', // Secondary
+    contrastText: '#FFFFFF',
+  },
+  tertiary: {
+    main: '#7D5260',
+    contrastText: '#FFFFFF',
+  },
+  error: {
+    main: '#B3261E',
+    contrastText: '#FFFFFF',
+  },
+  background: {
+    default: '#FFFBFE', // Surface
+    paper: '#FFFBFE', // Surface
+  },
+  text: {
+    primary: '#1C1B1F', // On Surface
+    secondary: '#49454F', // On Surface Variant
+  },
+  // Custom glass color token
+  glass: {
+    primary: getGlassBackgroundColor('#EADDFF', 0.8), // A light primary-based color for glass
+  },
+};
+
+const darkPalette = {
+  primary: {
+    main: '#D0BCFF', // Primary
+    contrastText: '#381E72',
+  },
+  secondary: {
+    main: '#CCC2DC', // Secondary
+    contrastText: '#332D41',
+  },
+  tertiary: {
+    main: '#EFB8C8',
+    contrastText: '#492532',
+  },
+  error: {
+    main: '#F2B8B5',
+    contrastText: '#601410',
+  },
+  background: {
+    default: '#1C1B1F', // Surface
+    paper: '#1C1B1F', // Surface
+  },
+  text: {
+    primary: '#E6E1E5', // On Surface
+    secondary: '#CAC4D0', // On Surface Variant
+  },
+  // Custom glass color token
+  glass: {
+    primary: getGlassBackgroundColor('#381E72', 0.6), // A dark primary-based color for glass
+  },
+};
+
+export const getPalette = (mode) => ({
+  palette: {
+    mode,
+    ...(mode === 'light' ? lightPalette : darkPalette),
+  },
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// src/theme/typography.js
+
+export const typography = {
+  fontFamily: '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+  h1: {
+    fontWeight: 600,
+    fontSize: '3rem',
+    lineHeight: 1.2,
+  },
+  h2: {
+    fontWeight: 600,
+    fontSize: '2.25rem',
+    lineHeight: 1.3,
+  },
+  // ... define other variants like h3, body1, button, etc.
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// src/theme/shape.js
+
+export const shape = {
+  borderRadius: 16, // Default is 4, M3 uses larger values (e.g., 12, 16)
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// src/theme/components.js
+
+export const getComponents = (mode) => ({
+  components: {
+    // Apply glass effect to Paper, the base for many components
+    MuiPaper: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          // The key to the glass effect!
+          backdropFilter: 'blur(10px)',
+          borderColor: theme.palette.mode === 'light' 
+            ? 'rgba(255, 255, 255, 0.5)' 
+            : 'rgba(0, 0, 0, 0.2)',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          // Use our custom glass color from the palette
+          backgroundColor: theme.palette.glass.primary,
+        }),
+      },
+    },
+    // Example: Fine-tuning the AppBar
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          // Make AppBar transparent to see the glass effect
+          background: 'transparent',
+          boxShadow: 'none', 
+        },
+      },
+    },
+    // Example: Overriding buttons for an M3 look
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: '24px', // M3 buttons are fully rounded
+          textTransform: 'none',
+          fontWeight: 600,
+        },
+      },
+    },
+  },
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+// src/theme/index.js
+
+import { createTheme } from '@mui/material/styles';
+import { getPalette } from './palette';
+import { typography } from './typography';
+import { shape } from './shape';
+import { getComponents } from './components';
+
+// A function to create the theme based on light/dark mode
+const createAppTheme = (mode = 'light') => {
+  const paletteConfig = getPalette(mode);
+  const componentsConfig = getComponents(mode);
+
+  return createTheme({
+    ...paletteConfig,
+    typography,
+    shape,
+    ...componentsConfig,
+  });
+};
+
+export default createAppTheme;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// src/App.js
+
+import React, { useState, useMemo } from 'react';
+import { ThemeProvider, CssBaseline, Button, Card, CardContent, Typography, Box } from '@mui/material';
+import createAppTheme from './theme';
+
+function App() {
+  const [mode, setMode] = useState('light');
+
+  // Memoize the theme to prevent recalculation on every render
+  const theme = useMemo(() => createAppTheme(mode), [mode]);
+
+  const toggleTheme = () => {
+    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+  };
+
+  return (
+    <ThemeProvider theme={theme}>
+      {/* CssBaseline resets browser styles and applies background color */}
+      <CssBaseline />
+      
+      {/* Add a background image to see the glass effect */}
+      <Box 
+        sx={{
+          minHeight: '100vh',
+          backgroundImage: 'url(https://source.unsplash.com/random/1600x900?nature,water)',
+          backgroundSize: 'cover',
+          padding: 4,
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 4 }}>
+            <Button variant="contained" onClick={toggleTheme}>
+              Toggle to {mode === 'light' ? 'Dark' : 'Light'} Mode
+            </Button>
+        </Box>
+        
+        <Card>
+          <CardContent>
+            <Typography variant="h2" gutterBottom>
+              Glassmorphism & M3
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              This card demonstrates the glass effect. It's built on a MuiPaper
+              component, which has the blurred backdrop filter applied via the central theme.
+              All components using Paper as a base will inherit this style.
+            </Typography>
+          </CardContent>
+        </Card>
+      </Box>
+    </ThemeProvider>
+  );
+}
+
+export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-----// src/theme/components.js
+
+/**
+ * @param {('light' | 'dark')} mode
+ * @returns {import('@mui/material').Components}
+ */
+export const getComponents = (mode) => ({
+  components: {
+    // ================================================================================================
+    // GLOBAL & BASE STYLES
+    // ================================================================================================
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          // Add a smooth scroll behavior
+          scrollBehavior: 'smooth',
+        },
+        // Custom scrollbar for a more modern look
+        '*::-webkit-scrollbar': {
+          width: '8px',
+        },
+        '*::-webkit-scrollbar-track': {
+          background: mode === 'light' ? '#f1f1f1' : '#2c2c2c',
+        },
+        '*::-webkit-scrollbar-thumb': {
+          background: mode === 'light' ? '#c5c5c5' : '#555',
+          borderRadius: '4px',
+        },
+        '*::-webkit-scrollbar-thumb:hover': {
+          background: mode === 'light' ? '#a8a8a8' : '#6a6a6a',
+        },
+      },
+    },
+    // The core of the Glassmorphism effect
+    MuiPaper: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          backdropFilter: 'blur(12px)',
+          border: `1px solid ${theme.palette.divider}`,
+          // Use our custom glass color from the palette
+          backgroundColor: theme.palette.glass.primary,
+          // M3 uses subtle tints for elevation instead of heavy shadows
+          boxShadow: 'none',
+        }),
+      },
+    },
+
+    // ================================================================================================
+    // LAYOUT & NAVIGATION
+    // ================================================================================================
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          // Make AppBar fully transparent to showcase the glass effect
+          background: 'transparent',
+          boxShadow: 'none',
+        },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+           // Drawer paper should also have the glass effect
+           boxShadow: 'none',
+        }
+      }
+    },
+    MuiTabs: {
+      styleOverrides: {
+        indicator: ({ theme }) => ({
+          // M3 indicator is taller
+          height: 3,
+          backgroundColor: theme.palette.primary.main,
+        }),
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          textTransform: 'none',
+          fontWeight: 600,
+          borderRadius: theme.shape.borderRadius, // Rounded corners for tab items
+          '&.Mui-selected': {
+            color: theme.palette.primary.main,
+          },
+        }),
+      },
+    },
+
+    // ================================================================================================
+    // BUTTONS & INTERACTIVE ELEMENTS
+    // ================================================================================================
+    MuiButton: {
+      defaultProps: {
+        disableElevation: true,
+      },
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderRadius: '24px', // M3 buttons are fully rounded "pills"
+          textTransform: 'none',
+          fontWeight: 600,
+          padding: '8px 24px',
+        }),
+        containedPrimary: ({ theme }) => ({
+          backgroundColor: theme.palette.primary.main,
+          color: theme.palette.primary.contrastText,
+        }),
+      },
+    },
+    MuiFab: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          boxShadow: 'none',
+          // M3 FABs have a specific shape
+          borderRadius: theme.shape.borderRadius,
+        }),
+      },
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          // Consistent sizing and shape
+          width: 40,
+          height: 40,
+          borderRadius: theme.shape.borderRadius * 0.75,
+        }),
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          fontWeight: 500,
+        },
+      },
+    },
+
+    // ================================================================================================
+    // FORMS & INPUTS
+    // ================================================================================================
+    MuiTextField: {
+      defaultProps: {
+        variant: 'outlined', // M3 prefers the outlined style
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderRadius: theme.shape.borderRadius,
+          // Remove the default border color transition
+          transition: 'none', 
+          '&:hover .MuiOutlinedInput-notchedOutline': {
+             borderColor: theme.palette.text.secondary,
+          },
+          '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+             borderColor: theme.palette.primary.main,
+             borderWidth: '2px',
+          },
+        }),
+      },
+    },
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          fontWeight: 500,
+        },
+      },
+    },
+    MuiSwitch: {
+      styleOverrides: {
+        root: {
+          width: 42,
+          height: 26,
+          padding: 0,
+        },
+        switchBase: {
+          padding: 0,
+          margin: 2,
+          transitionDuration: '300ms',
+          '&.Mui-checked': {
+            transform: 'translateX(16px)',
+            color: '#fff',
+            '& + .MuiSwitch-track': {
+              backgroundColor: mode === 'light' ? '#6750A4' : '#D0BCFF',
+              opacity: 1,
+              border: 0,
+            },
+          },
+        },
+        thumb: {
+          boxSizing: 'border-box',
+          width: 22,
+          height: 22,
+        },
+        track: {
+          borderRadius: 26 / 2,
+          backgroundColor: mode === 'light' ? '#E9E9EA' : '#39393D',
+          opacity: 1,
+        },
+      },
+    },
+
+    // ================================================================================================
+    // DATA DISPLAY & SURFACES
+    // ================================================================================================
+    MuiCard: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          // Cards are based on Paper, so they inherit the glass, but we can fine-tune
+          padding: theme.spacing(1), // Add some internal padding
+          boxShadow: 'none',
+        }),
+      },
+    },
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: ({ theme }) => ({
+           // Tooltips are also Paper, so they get the glass effect by default
+           fontWeight: 500,
+           padding: theme.spacing(1, 2),
+        }),
+        arrow: ({ theme }) => ({
+          color: theme.palette.glass.primary,
+        }),
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          // Dialogs are a prime candidate for the glass effect
+          padding: '24px',
+        }
+      }
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          borderRadius: theme.shape.borderRadius * 2, // M3 list items are very rounded
+          '&.Mui-selected': {
+            backgroundColor: theme.palette.action.selected,
+            '&:hover': {
+              backgroundColor: theme.palette.action.hover,
+            }
+          },
+        }),
+      },
+    },
+  },
+});
+
+
+
+
+
