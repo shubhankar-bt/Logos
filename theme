@@ -1,0 +1,619 @@
+import { createTheme } from '@mui/material/styles';
+
+// Material 3 Color Tokens
+const material3Colors = {
+  light: {
+    primary: '#6750A4',
+    onPrimary: '#FFFFFF',
+    primaryContainer: '#EADDFF',
+    onPrimaryContainer: '#21005D',
+    secondary: '#625B71',
+    onSecondary: '#FFFFFF',
+    secondaryContainer: '#E8DEF8',
+    onSecondaryContainer: '#1D192B',
+    tertiary: '#7D5260',
+    onTertiary: '#FFFFFF',
+    tertiaryContainer: '#FFD8E4',
+    onTertiaryContainer: '#31111D',
+    error: '#BA1A1A',
+    onError: '#FFFFFF',
+    errorContainer: '#FFDAD6',
+    onErrorContainer: '#410002',
+    background: '#FFFBFE',
+    onBackground: '#1C1B1F',
+    surface: '#FFFBFE',
+    onSurface: '#1C1B1F',
+    surfaceVariant: '#E7E0EC',
+    onSurfaceVariant: '#49454F',
+    outline: '#79747E',
+    outlineVariant: '#CAC4D0',
+    shadow: '#000000',
+    scrim: '#000000',
+    inverseSurface: '#313033',
+    inverseOnSurface: '#F4EFF4',
+    inversePrimary: '#D0BCFF',
+    surfaceDim: '#DDD8DD',
+    surfaceBright: '#FFFBFE',
+    surfaceContainerLowest: '#FFFFFF',
+    surfaceContainerLow: '#F7F2F7',
+    surfaceContainer: '#F1ECF1',
+    surfaceContainerHigh: '#ECE6EB',
+    surfaceContainerHighest: '#E6E0E5',
+  },
+  dark: {
+    primary: '#D0BCFF',
+    onPrimary: '#381E72',
+    primaryContainer: '#4F378B',
+    onPrimaryContainer: '#EADDFF',
+    secondary: '#CCC2DC',
+    onSecondary: '#332D41',
+    secondaryContainer: '#4A4458',
+    onSecondaryContainer: '#E8DEF8',
+    tertiary: '#EFB8C8',
+    onTertiary: '#492532',
+    tertiaryContainer: '#633B48',
+    onTertiaryContainer: '#FFD8E4',
+    error: '#FFB4AB',
+    onError: '#690005',
+    errorContainer: '#93000A',
+    onErrorContainer: '#FFDAD6',
+    background: '#10080E',
+    onBackground: '#E6E0E5',
+    surface: '#10080E',
+    onSurface: '#E6E0E5',
+    surfaceVariant: '#49454F',
+    onSurfaceVariant: '#CAC4D0',
+    outline: '#938F99',
+    outlineVariant: '#49454F',
+    shadow: '#000000',
+    scrim: '#000000',
+    inverseSurface: '#E6E0E5',
+    inverseOnSurface: '#313033',
+    inversePrimary: '#6750A4',
+    surfaceDim: '#10080E',
+    surfaceBright: '#37334A',
+    surfaceContainerLowest: '#0B0609',
+    surfaceContainerLow: '#1C1B1F',
+    surfaceContainer: '#201F23',
+    surfaceContainerHigh: '#2B292D',
+    surfaceContainerHighest: '#363438',
+  },
+};
+
+// Create Material 3 Theme with comprehensive component theming
+export const createMaterial3Theme = (mode) => {
+  const colors = material3Colors[mode];
+  
+  return createTheme({
+    palette: {
+      mode,
+      primary: {
+        main: colors.primary,
+        contrastText: colors.onPrimary,
+        light: colors.primaryContainer,
+        dark: mode === 'light' ? colors.primaryContainer : colors.primary,
+      },
+      secondary: {
+        main: colors.secondary,
+        contrastText: colors.onSecondary,
+        light: colors.secondaryContainer,
+        dark: mode === 'light' ? colors.secondaryContainer : colors.secondary,
+      },
+      error: {
+        main: colors.error,
+        contrastText: colors.onError,
+        light: colors.errorContainer,
+        dark: mode === 'light' ? colors.errorContainer : colors.error,
+      },
+      warning: {
+        main: '#F9AB00',
+        contrastText: '#FFFFFF',
+      },
+      info: {
+        main: colors.tertiary,
+        contrastText: colors.onTertiary,
+      },
+      success: {
+        main: '#146C2E',
+        contrastText: '#FFFFFF',
+      },
+      background: {
+        default: colors.background,
+        paper: colors.surface,
+      },
+      text: {
+        primary: colors.onSurface,
+        secondary: colors.onSurfaceVariant,
+        disabled: `${colors.onSurface}61`,
+      },
+      divider: colors.outlineVariant,
+      grey: {
+        50: colors.surfaceContainerLowest,
+        100: colors.surfaceContainerLow,
+        200: colors.surfaceContainer,
+        300: colors.surfaceContainerHigh,
+        400: colors.surfaceContainerHighest,
+        500: colors.outline,
+        600: colors.onSurfaceVariant,
+        700: colors.onSurface,
+        800: colors.inverseSurface,
+        900: colors.shadow,
+      },
+    },
+    typography: {
+      fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+      h1: {
+        fontSize: '3.5rem',
+        fontWeight: 400,
+        lineHeight: 1.167,
+        letterSpacing: '-0.01562em',
+      },
+      h2: {
+        fontSize: '3.5rem',
+        fontWeight: 400,
+        lineHeight: 1.2,
+        letterSpacing: '-0.00833em',
+      },
+      h3: {
+        fontSize: '3rem',
+        fontWeight: 400,
+        lineHeight: 1.167,
+        letterSpacing: '0em',
+      },
+      h4: {
+        fontSize: '2.125rem',
+        fontWeight: 400,
+        lineHeight: 1.235,
+        letterSpacing: '0.00735em',
+      },
+      h5: {
+        fontSize: '1.5rem',
+        fontWeight: 400,
+        lineHeight: 1.334,
+        letterSpacing: '0em',
+      },
+      h6: {
+        fontSize: '1.25rem',
+        fontWeight: 500,
+        lineHeight: 1.6,
+        letterSpacing: '0.0075em',
+      },
+      body1: {
+        fontSize: '1rem',
+        fontWeight: 400,
+        lineHeight: 1.5,
+        letterSpacing: '0.00938em',
+      },
+      body2: {
+        fontSize: '0.875rem',
+        fontWeight: 400,
+        lineHeight: 1.43,
+        letterSpacing: '0.01071em',
+      },
+      button: {
+        fontSize: '0.875rem',
+        fontWeight: 500,
+        lineHeight: 1.75,
+        letterSpacing: '0.02857em',
+        textTransform: 'none',
+      },
+    },
+    shape: {
+      borderRadius: 12,
+    },
+    shadows: [
+      'none',
+      '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)',
+      '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15)',
+      '0px 1px 3px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15)',
+      '0px 2px 3px rgba(0, 0, 0, 0.3), 0px 6px 10px 4px rgba(0, 0, 0, 0.15)',
+      '0px 4px 4px rgba(0, 0, 0, 0.3), 0px 8px 12px 6px rgba(0, 0, 0, 0.15)',
+      '0px 6px 10px rgba(0, 0, 0, 0.3), 0px 20px 25px rgba(0, 0, 0, 0.15)',
+      '0px 8px 12px rgba(0, 0, 0, 0.3), 0px 32px 40px rgba(0, 0, 0, 0.15)',
+      '0px 16px 24px rgba(0, 0, 0, 0.3), 0px 40px 50px rgba(0, 0, 0, 0.15)',
+      ...Array(16).fill('0px 16px 24px rgba(0, 0, 0, 0.3), 0px 40px 50px rgba(0, 0, 0, 0.15)')
+    ],
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: '20px',
+            textTransform: 'none',
+            fontWeight: 500,
+            padding: '10px 24px',
+            minHeight: '40px',
+          },
+          contained: {
+            backgroundColor: colors.primary,
+            color: colors.onPrimary,
+            boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)',
+            '&:hover': {
+              backgroundColor: colors.primary,
+              boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15)',
+            },
+          },
+          outlined: {
+            borderColor: colors.outline,
+            color: colors.primary,
+            borderWidth: '1px',
+            '&:hover': {
+              backgroundColor: `${colors.primary}08`,
+              borderColor: colors.outline,
+            },
+          },
+          text: {
+            color: colors.primary,
+            '&:hover': {
+              backgroundColor: `${colors.primary}08`,
+            },
+          },
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            backgroundColor: colors.surfaceContainerLow,
+            borderRadius: '12px',
+            boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)',
+            border: `1px solid ${colors.outlineVariant}`,
+          },
+        },
+      },
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '4px',
+              backgroundColor: colors.surfaceContainerHighest,
+              '& fieldset': {
+                borderColor: colors.outline,
+              },
+              '&:hover fieldset': {
+                borderColor: colors.onSurface,
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: colors.primary,
+                borderWidth: '2px',
+              },
+            },
+            '& .MuiInputLabel-root': {
+              color: colors.onSurfaceVariant,
+              '&.Mui-focused': {
+                color: colors.primary,
+              },
+            },
+          },
+        },
+      },
+      MuiAppBar: {
+        styleOverrides: {
+          root: {
+            backgroundColor: colors.surface,
+            color: colors.onSurface,
+            boxShadow: 'none',
+            borderBottom: `1px solid ${colors.outlineVariant}`,
+          },
+        },
+      },
+      MuiChip: {
+        styleOverrides: {
+          root: {
+            borderRadius: '8px',
+            backgroundColor: colors.secondaryContainer,
+            color: colors.onSecondaryContainer,
+            '&.MuiChip-outlined': {
+              borderColor: colors.outline,
+              backgroundColor: 'transparent',
+              color: colors.onSurface,
+            },
+          },
+        },
+      },
+      MuiFab: {
+        styleOverrides: {
+          root: {
+            backgroundColor: colors.primaryContainer,
+            color: colors.onPrimaryContainer,
+            boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.3), 0px 6px 10px 4px rgba(0, 0, 0, 0.15)',
+            '&:hover': {
+              backgroundColor: colors.primaryContainer,
+              boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.3), 0px 8px 12px 6px rgba(0, 0, 0, 0.15)',
+            },
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundColor: colors.surface,
+            color: colors.onSurface,
+          },
+          elevation1: {
+            backgroundColor: colors.surfaceContainer,
+            boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)',
+          },
+          elevation2: {
+            backgroundColor: colors.surfaceContainerHigh,
+            boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15)',
+          },
+          elevation3: {
+            backgroundColor: colors.surfaceContainerHigh,
+            boxShadow: '0px 1px 3px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15)',
+          },
+        },
+      },
+      MuiDialog: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: colors.surfaceContainerHigh,
+            borderRadius: '28px',
+            boxShadow: '0px 8px 12px rgba(0, 0, 0, 0.3), 0px 32px 40px rgba(0, 0, 0, 0.15)',
+          },
+        },
+      },
+      MuiMenu: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: colors.surfaceContainer,
+            borderRadius: '4px',
+            boxShadow: '0px 2px 3px rgba(0, 0, 0, 0.3), 0px 6px 10px 4px rgba(0, 0, 0, 0.15)',
+            border: `1px solid ${colors.outlineVariant}`,
+          },
+        },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: {
+            borderRadius: '0px',
+            '&:hover': {
+              backgroundColor: colors.surfaceContainerHighest,
+            },
+            '&.Mui-selected': {
+              backgroundColor: colors.secondaryContainer,
+              color: colors.onSecondaryContainer,
+              '&:hover': {
+                backgroundColor: colors.secondaryContainer,
+              },
+            },
+          },
+        },
+      },
+      MuiSwitch: {
+        styleOverrides: {
+          root: {
+            '& .MuiSwitch-switchBase': {
+              '&.Mui-checked': {
+                color: colors.onPrimary,
+                '& + .MuiSwitch-track': {
+                  backgroundColor: colors.primary,
+                },
+              },
+            },
+            '& .MuiSwitch-track': {
+              backgroundColor: colors.surfaceVariant,
+            },
+          },
+        },
+      },
+      MuiCheckbox: {
+        styleOverrides: {
+          root: {
+            color: colors.onSurfaceVariant,
+            '&.Mui-checked': {
+              color: colors.primary,
+            },
+          },
+        },
+      },
+      MuiRadio: {
+        styleOverrides: {
+          root: {
+            color: colors.onSurfaceVariant,
+            '&.Mui-checked': {
+              color: colors.primary,
+            },
+          },
+        },
+      },
+      MuiSlider: {
+        styleOverrides: {
+          root: {
+            color: colors.primary,
+            '& .MuiSlider-track': {
+              backgroundColor: colors.primary,
+            },
+            '& .MuiSlider-rail': {
+              backgroundColor: colors.surfaceVariant,
+            },
+            '& .MuiSlider-thumb': {
+              backgroundColor: colors.primary,
+              boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)',
+            },
+          },
+        },
+      },
+      MuiLinearProgress: {
+        styleOverrides: {
+          root: {
+            backgroundColor: colors.surfaceVariant,
+            borderRadius: '2px',
+            '& .MuiLinearProgress-bar': {
+              backgroundColor: colors.primary,
+              borderRadius: '2px',
+            },
+          },
+        },
+      },
+      MuiCircularProgress: {
+        styleOverrides: {
+          root: {
+            color: colors.primary,
+          },
+        },
+      },
+      MuiAlert: {
+        styleOverrides: {
+          root: {
+            borderRadius: '12px',
+          },
+          standardError: {
+            backgroundColor: colors.errorContainer,
+            color: colors.onErrorContainer,
+          },
+          standardWarning: {
+            backgroundColor: '#FEF7E0',
+            color: '#5E4037',
+          },
+          standardInfo: {
+            backgroundColor: colors.tertiaryContainer,
+            color: colors.onTertiaryContainer,
+          },
+          standardSuccess: {
+            backgroundColor: '#D1F2EB',
+            color: '#0F5132',
+          },
+        },
+      },
+      MuiBadge: {
+        styleOverrides: {
+          badge: {
+            backgroundColor: colors.error,
+            color: colors.onError,
+            borderRadius: '6px',
+          },
+        },
+      },
+      MuiAvatar: {
+        styleOverrides: {
+          root: {
+            backgroundColor: colors.primaryContainer,
+            color: colors.onPrimaryContainer,
+          },
+        },
+      },
+      MuiBottomNavigation: {
+        styleOverrides: {
+          root: {
+            backgroundColor: colors.surfaceContainer,
+            borderTop: `1px solid ${colors.outlineVariant}`,
+          },
+        },
+      },
+      MuiBottomNavigationAction: {
+        styleOverrides: {
+          root: {
+            color: colors.onSurfaceVariant,
+            '&.Mui-selected': {
+              color: colors.onSecondaryContainer,
+              backgroundColor: colors.secondaryContainer,
+              borderRadius: '16px',
+              margin: '4px',
+            },
+          },
+        },
+      },
+      MuiTabs: {
+        styleOverrides: {
+          root: {
+            borderBottom: `1px solid ${colors.outlineVariant}`,
+          },
+          indicator: {
+            backgroundColor: colors.primary,
+            height: '3px',
+            borderRadius: '3px 3px 0 0',
+          },
+        },
+      },
+      MuiTab: {
+        styleOverrides: {
+          root: {
+            textTransform: 'none',
+            fontWeight: 500,
+            color: colors.onSurfaceVariant,
+            '&.Mui-selected': {
+              color: colors.primary,
+            },
+          },
+        },
+      },
+      MuiAccordion: {
+        styleOverrides: {
+          root: {
+            backgroundColor: colors.surfaceContainer,
+            borderRadius: '12px !important',
+            boxShadow: 'none',
+            border: `1px solid ${colors.outlineVariant}`,
+            '&:before': {
+              display: 'none',
+            },
+            '&.Mui-expanded': {
+              margin: '16px 0',
+            },
+          },
+        },
+      },
+      MuiAccordionSummary: {
+        styleOverrides: {
+          root: {
+            backgroundColor: 'transparent',
+            borderRadius: '12px',
+            '&.Mui-expanded': {
+              borderBottomLeftRadius: '0',
+              borderBottomRightRadius: '0',
+            },
+          },
+        },
+      },
+      MuiTable: {
+        styleOverrides: {
+          root: {
+            backgroundColor: colors.surface,
+          },
+        },
+      },
+      MuiTableHead: {
+        styleOverrides: {
+          root: {
+            backgroundColor: colors.surfaceVariant,
+            '& .MuiTableCell-head': {
+              backgroundColor: colors.surfaceVariant,
+              color: colors.onSurfaceVariant,
+              fontWeight: 500,
+            },
+          },
+        },
+      },
+      MuiTableCell: {
+        styleOverrides: {
+          root: {
+            borderBottom: `1px solid ${colors.outlineVariant}`,
+            color: colors.onSurface,
+          },
+        },
+      },
+      MuiTableRow: {
+        styleOverrides: {
+          root: {
+            '&:hover': {
+              backgroundColor: colors.surfaceContainerHighest,
+            },
+            '&.Mui-selected': {
+              backgroundColor: colors.secondaryContainer,
+              '&:hover': {
+                backgroundColor: colors.secondaryContainer,
+              },
+            },
+          },
+        },
+      },
+      MuiDrawer: {
+        styleOverrides: {
+          paper: {
+            backgroundColor: colors.surfaceContainerLow,
+            borderRight: `1px solid ${colors.outlineVariant}`,
+          },
+        },
+      },
+    },
+  });
+};
