@@ -1,0 +1,409 @@
+import { useState } from "react";
+import {
+  Box,
+  Container,
+  Typography,
+  Card,
+  CardContent,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+  Grid,
+  Paper,
+  CircularProgress,
+  Divider,
+} from "@mui/material";
+import {
+  CalendarToday,
+  Description,
+  Download,
+  Visibility,
+  FilterList,
+  TrendingUp,
+} from "@mui/icons-material";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { format } from "date-fns";
+
+// Mock report types - these would come from your backend
+const reportTypes = [
+  { id: "financial", label: "Financial Report" },
+  { id: "operational", label: "Operational Report" },
+  { id: "quarterly", label: "Quarterly Summary" },
+  { id: "annual", label: "Annual Overview" },
+  { id: "compliance", label: "Compliance Report" },
+];
+
+const Reports = () => {
+  const [selectedReportType, setSelectedReportType] = useState("");
+  const [date, setDate] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [fetchedReport, setFetchedReport] = useState(null);
+
+  const handleFetchReport = async () => {
+    if (!selectedReportType || !date) {
+      alert("Please select both report type and date");
+      return;
+    }
+
+    setIsLoading(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      setFetchedReport({
+        type: reportTypes.find((r) => r.id === selectedReportType)?.label,
+        date: format(date, "PPP"),
+        size: "2.4 MB",
+        pages: 42,
+        generatedAt: new Date().toISOString(),
+      });
+      setIsLoading(false);
+    }, 1500);
+  };
+
+  const handleViewReport = () => {
+    alert("Opening report viewer...");
+    // Implement view logic
+  };
+
+  const handleDownloadReport = () => {
+    alert("Downloading report...");
+    // Implement download logic
+  };
+
+  return (
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Box sx={{ minHeight: "100vh", bgcolor: "#f5f7fa" }}>
+        {/* Header */}
+        <Paper
+          elevation={2}
+          sx={{
+            borderBottom: 1,
+            borderColor: "divider",
+            bgcolor: "background.paper",
+          }}
+        >
+          <Container maxWidth="xl" sx={{ py: 3 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 56,
+                  height: 56,
+                  borderRadius: 2,
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                }}
+              >
+                <Description sx={{ fontSize: 32, color: "white" }} />
+              </Box>
+              <Box>
+                <Typography variant="h4" fontWeight="bold" color="text.primary">
+                  GLIF Reports
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Generate and manage your reports
+                </Typography>
+              </Box>
+            </Box>
+          </Container>
+        </Paper>
+
+        <Container maxWidth="xl" sx={{ py: 4 }}>
+          {/* Stats Cards */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} md={4}>
+              <Card elevation={2} sx={{ height: "100%" }}>
+                <CardContent>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      mb: 2,
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      Total Reports
+                    </Typography>
+                    <Description sx={{ fontSize: 20, color: "text.secondary" }} />
+                  </Box>
+                  <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
+                    243
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Generated this year
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Card elevation={2} sx={{ height: "100%" }}>
+                <CardContent>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      mb: 2,
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      This Month
+                    </Typography>
+                    <TrendingUp sx={{ fontSize: 20, color: "success.main" }} />
+                  </Box>
+                  <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
+                    18
+                  </Typography>
+                  <Typography variant="caption" color="success.main">
+                    +12% from last month
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <Card elevation={2} sx={{ height: "100%" }}>
+                <CardContent>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      mb: 2,
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      Report Types
+                    </Typography>
+                    <FilterList sx={{ fontSize: 20, color: "text.secondary" }} />
+                  </Box>
+                  <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
+                    {reportTypes.length}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Available formats
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+
+          {/* Main Report Generator */}
+          <Card elevation={3}>
+            <CardContent sx={{ p: 4 }}>
+              <Typography variant="h5" fontWeight="bold" sx={{ mb: 1 }}>
+                Generate Report
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+                Select report type and date to fetch your report
+              </Typography>
+
+              <Grid container spacing={3} sx={{ mb: 3 }}>
+                {/* Report Type Selector */}
+                <Grid item xs={12} md={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Report Type</InputLabel>
+                    <Select
+                      value={selectedReportType}
+                      onChange={(e) => setSelectedReportType(e.target.value)}
+                      label="Report Type"
+                    >
+                      {reportTypes.map((type) => (
+                        <MenuItem key={type.id} value={type.id}>
+                          {type.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                {/* Date Picker */}
+                <Grid item xs={12} md={6}>
+                  <DatePicker
+                    label="Report Date"
+                    value={date}
+                    onChange={(newValue) => setDate(newValue)}
+                    slotProps={{
+                      textField: {
+                        fullWidth: true,
+                      },
+                    }}
+                  />
+                </Grid>
+              </Grid>
+
+              {/* Fetch Button */}
+              <Button
+                onClick={handleFetchReport}
+                disabled={isLoading || !selectedReportType || !date}
+                variant="contained"
+                size="large"
+                fullWidth
+                startIcon={
+                  isLoading ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : (
+                    <Description />
+                  )
+                }
+                sx={{
+                  py: 1.5,
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  "&:hover": {
+                    background: "linear-gradient(135deg, #5568d3 0%, #6941a0 100%)",
+                  },
+                }}
+              >
+                {isLoading ? "Fetching Report..." : "Fetch Report"}
+              </Button>
+
+              {/* Report Preview */}
+              {fetchedReport && (
+                <Box sx={{ mt: 4 }}>
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 3,
+                      bgcolor: "grey.50",
+                      border: 1,
+                      borderColor: "divider",
+                    }}
+                  >
+                    <Typography variant="h6" fontWeight="bold" sx={{ mb: 3 }}>
+                      Report Preview
+                    </Typography>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          Type:
+                        </Typography>
+                        <Typography variant="body2" fontWeight="medium">
+                          {fetchedReport.type}
+                        </Typography>
+                      </Box>
+                      <Divider />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          Date:
+                        </Typography>
+                        <Typography variant="body2" fontWeight="medium">
+                          {fetchedReport.date}
+                        </Typography>
+                      </Box>
+                      <Divider />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          Size:
+                        </Typography>
+                        <Typography variant="body2" fontWeight="medium">
+                          {fetchedReport.size}
+                        </Typography>
+                      </Box>
+                      <Divider />
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          Pages:
+                        </Typography>
+                        <Typography variant="body2" fontWeight="medium">
+                          {fetchedReport.pages}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Paper>
+
+                  {/* Action Buttons */}
+                  <Grid container spacing={2} sx={{ mt: 2 }}>
+                    <Grid item xs={12} sm={6}>
+                      <Button
+                        onClick={handleViewReport}
+                        variant="outlined"
+                        size="large"
+                        fullWidth
+                        startIcon={<Visibility />}
+                      >
+                        View Report
+                      </Button>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Button
+                        onClick={handleDownloadReport}
+                        variant="contained"
+                        size="large"
+                        fullWidth
+                        startIcon={<Download />}
+                        sx={{
+                          bgcolor: "success.main",
+                          "&:hover": {
+                            bgcolor: "success.dark",
+                          },
+                        }}
+                      >
+                        Download Report
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Empty State Hint */}
+          {!fetchedReport && (
+            <Box sx={{ mt: 4, textAlign: "center" }}>
+              <Box
+                sx={{
+                  mx: "auto",
+                  width: 64,
+                  height: 64,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "50%",
+                  bgcolor: "grey.100",
+                }}
+              >
+                <Description sx={{ fontSize: 32, color: "text.secondary" }} />
+              </Box>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ mt: 2 }}
+              >
+                No report fetched yet. Select a report type and date to get started.
+              </Typography>
+            </Box>
+          )}
+        </Container>
+      </Box>
+    </LocalizationProvider>
+  );
+};
+
+export default Reports;
