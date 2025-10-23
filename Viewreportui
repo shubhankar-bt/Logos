@@ -18,23 +18,22 @@ import {
   Link,
   CardContent,
   Grid,
-  Divider,
-  useTheme,
   IconButton,
 } from "@mui/material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import DownloadForOfflineTwoToneIcon from "@mui/icons-material/DownloadForOfflineTwoTone";
-import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import useApi from "../../../hooks/useApi";
 import {
-  ContentPasteOffTwoTone,
-  Description,
   Download,
   Visibility,
+  PictureAsPdf,
+  InsertDriveFile,
+  Description,
+  ContentPasteOffTwoTone,
+  DownloadForOfflineTwoTone,
+  VisibilityRounded,
 } from "@mui/icons-material";
-import { PictureAsPdf, InsertDriveFile } from "@mui/icons-material";
+import useApi from "../../../hooks/useApi";
 
 // --- Helper Functions ---
 
@@ -49,7 +48,6 @@ const isViewable = (mimeType) => {
 
 const base64ToBlob = (base64, mimeType) => {
   const byteCharacters = atob(base64);
-
   const byteArrays = [];
   const sliceSize = 512;
   for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
@@ -65,6 +63,7 @@ const base64ToBlob = (base64, mimeType) => {
 };
 
 const getFileIcon = (fileName) => {
+  if (!fileName) return <InsertDriveFile />;
   const extension = fileName.split(".").pop().toLowerCase();
   switch (extension) {
     case "pdf":
@@ -82,26 +81,38 @@ const getFileIcon = (fileName) => {
 const PdfViewer = ({ objectUrl, fileName }) => (
   <iframe
     src={objectUrl}
-    width="100%"
     title={fileName}
-    className="w-full h-full border-0"
+    style={{ width: "100%", height: "100%", border: "none" }}
   />
 );
 
 const ImageViewer = ({ objectUrl, fileName }) => (
-  <div className="w-full h-full flex items-center justify-center p-4 bg-gray-200">
+  <Box
+    sx={{
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      p: 2,
+      backgroundColor: "grey.200",
+    }}
+  >
     <img
       src={objectUrl}
       alt={fileName}
-      className="max-w-full max-h-full object-contain"
+      style={{
+        maxWidth: "100%",
+        maxHeight: "100%",
+        objectFit: "contain",
+      }}
     />
-  </div>
+  </Box>
 );
 
 const TextViewer = ({ objectUrl }) => {
   const [content, setContent] = useState("");
   useEffect(() => {
-    // We need to read the blob content as text to display it
     const reader = new FileReader();
     fetch(objectUrl)
       .then((res) => res.blob())
@@ -114,12 +125,15 @@ const TextViewer = ({ objectUrl }) => {
   return (
     <pre
       style={{
-        whiteSpace:
-          "pre-wrap" /* Allows wrapping while preserving whitespace and line breaks */,
-        wordWrap:
-          "break-word" /* Ensures long strings without spaces break to fit the container */,
-        overflowWrap: "break-word" /* Modern equivalent of word-wrap */,
+        whiteSpace: "pre-wrap",
+        wordWrap: "break-word",
         overflow: "auto",
+        height: "100%",
+        color: "#FFFFFF", // Fixed: Light text for dark dialog
+        backgroundColor: "rgba(0, 0, 0, 0.2)", // Added for contrast
+        padding: "16px",
+        margin: 0,
+        borderRadius: "4px",
       }}
     >
       {content}
@@ -145,7 +159,7 @@ const renderViewer = (objectUrl, file) => {
           Preview Unavailable
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Cant display the content of the file!
+          Cannot display the content of this file type.
         </Typography>
       </CardContent>
     </Card>
@@ -154,12 +168,9 @@ const renderViewer = (objectUrl, file) => {
 
 //..........................Report Viewer Dialog.................................//
 const ReportDialog = (props) => {
-  console.log(props);
-
   return (
     <Dialog
       sx={{
-        // Target the Paper component for the dialog box background
         "& .MuiPaper-root": {
           backgroundColor: "#7fa0b5",
         },
@@ -167,30 +178,26 @@ const ReportDialog = (props) => {
       slotProps={{
         backdrop: {
           sx: {
-            backgroundColor: "rgba(0, 0, 0, 0.5)", // Darker, more opaque backdrop
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
           },
         },
       }}
-      maxWidth
+      fullWidth
+      maxWidth="lg" // Use maxWidth for better responsiveness
       onClose={() => props.setview(false)}
       open={props.open}
     >
-      <DialogTitle>{props.name}</DialogTitle>
-      <DialogContent
-        sx={{ height: "70vh", width: "70vw" }}
-        // sx={{ maxHeight: "80vh", minWidth: "65vw" }}
-      >
-        <Box
-          style={{ flexDirection: "row", flexWrap: "wrap" }}
-          sx={{ mt: 3, mb: 3, height: 1 }}
-        >
+      <DialogTitle>{props.fileName || "File Viewer"}</DialogTitle>
+      <DialogContent sx={{ height: "75vh" }}>
+        <Box sx={{ mt: 1, mb: 1, height: "100%" }}>
           {renderViewer(props.url, props.file)}
         </Box>
       </DialogContent>
       <DialogActions>
         {props.url && (
-          <Link href={props.url} download>
-            <Button>Download</Button>
+          // Fixed: Added download attribute with the correct fileName
+          <Link href={props.url} download={props.fileName}>
+            <Button sx={{ color: "white" }}>Download</Button>
           </Link>
         )}
       </DialogActions>
@@ -202,10 +209,10 @@ const ReportDialog = (props) => {
 
 export default function GlifReports() {
   const [repTypes, setRepTypes] = useState([]);
-  const [selectedReport, setReport] = useState();
+  const [selectedReport, setReport] = useState(""); // Default to empty string
   const [selectedDate, setDate] = useState(null);
   const [isViewing, setIsViewing] = useState(false);
-  const [fileDetails, setFileDetais] = useState(null);
+  const [fileDetails, setFileDetails] = useState(null);
   const [objectUrl, setObjectUrl] = useState(null);
   const { callApi } = useApi();
   const [isLoading, setIsLoading] = useState(false);
@@ -215,24 +222,27 @@ export default function GlifReports() {
 
   //Getting Reports Types list
   useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      try {
+        const data = await callApi("RS/reports/types", { roleId: 56 }, "POST");
+        setRepTypes(data.data || []);
+      } catch (error) {
+        console.error("Failed to fetch report types:", error);
+      }
+      setIsLoading(false);
+    }
     fetchData();
-  }, []);
+  }, [callApi]);
 
+  // Clean up object URL to prevent memory leaks
   useEffect(() => {
-    // This function runs when the component unmounts or when objectUrl changes
     return () => {
       if (objectUrl) {
         URL.revokeObjectURL(objectUrl);
       }
     };
   }, [objectUrl]);
-
-  async function fetchData() {
-    setIsLoading(true);
-    const data = await callApi("RS/reports/types", { roleId: 56 }, "POST");
-    setRepTypes(data.data);
-    setIsLoading(false);
-  }
 
   //setting selected report
   const handleSelect = (event) => {
@@ -241,10 +251,17 @@ export default function GlifReports() {
 
   //Fetching Report data
   async function handleFetchReportData() {
+    if (!selectedReport || !selectedDate) return;
+
     setIsLoading(true);
     setObjectUrl(null);
-    setFileDetais(null);
-    setNoReportMessage(null);
+    setFileDetails(null);
+    setNoReportMessage(null); // Clear previous messages
+
+    // Revoke previous URL if it exists
+    if (objectUrl) {
+      URL.revokeObjectURL(objectUrl);
+    }
 
     try {
       const response = await callApi(
@@ -256,21 +273,18 @@ export default function GlifReports() {
         },
         "POST"
       );
+
       if (!response?.success) {
-        if (response?.message) {
-          setNoReportMessage(response.message);
-        } else {
-          // Fallback for generic network errors or unexpected responses
-          setNoReportMessage(
+        setNoReportMessage(
+          response?.message ||
             "No report file found for the selected type and date."
-          );
-        }
+        );
         return;
       }
 
       if (!response.data?.fileContent || !response.data?.fileType) {
         setNoReportMessage(
-          "No file content or file type was received. Please try again"
+          "No file content or file type was received. Please try again."
         );
         return;
       }
@@ -279,10 +293,9 @@ export default function GlifReports() {
         response.data.fileContent,
         response.data.fileType
       );
-
       const newObjectUrl = URL.createObjectURL(blobObject);
 
-      setFileDetais({
+      setFileDetails({
         name: response.data.fileName,
         type: response.data.fileType,
       });
@@ -295,83 +308,49 @@ export default function GlifReports() {
     }
   }
 
-  function handleDownloadReport(url) {
+  // Fixed: Added fileName parameter and set link.download
+  function handleDownloadReport(url, fileName) {
     const link = document.createElement("a");
     link.href = url;
-    // link.download = `${file.name}.${name}`;
-    console.log(link.download);
-
+    link.download = fileName; // This forces the download with the correct name
     document.body.appendChild(link);
-
     link.click();
-
-    // Clean up
-    link.remove();
-    window.URL.revokeObjectURL(url);
+    document.body.removeChild(link); // Clean up
   }
-
-  const handleViewReport = () => {
-    setIsViewing(true);
-  };
 
   return (
     <Container maxWidth={false} disableGutters>
       <Stack spacing={4}>
-        <card>
-          <Paper sx={{ p: 3, width: "100%" }} elevation={3}>
-            {/* <Typography sx={{ mb: 1 ,}} variant="h4" component="h1" gutterBottom>
-            Welcome to GLIF Reporting System
-          </Typography> */}
-            <DownloadForOfflineTwoToneIcon
+        {/* Fixed: Changed <card> to <Card> */}
+        <Card>
+          <Paper sx={{ p: 3, width: "100%", textAlign: "center" }} elevation={3}>
+            {/* Cleaned up: Used Box for easier centering */}
+            <Box
               sx={{
-                height: 70,
-                width: 70,
                 display: "flex",
-                alignItems: "center",
                 justifyContent: "center",
                 mb: 2,
-                width: "100%",
               }}
-            />
-            <Typography
-              sx={{
-                mb: 5,
-                fontWeight: 5,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                mb: 2,
-                width: "100%",
-              }}
-              variant="h6"
-              component="h1"
-              gutterBottom
             >
+              <DownloadForOfflineTwoTone
+                sx={{
+                  height: 70,
+                  width: 70,
+                }}
+              />
+            </Box>
+            <Typography variant="h6" component="h1" gutterBottom>
               Utilize the required report type and date criteria below to
-              precisely define and retrieve the required reports. <br />
+              precisely define and retrieve the required reports.
             </Typography>
-            <Typography
-              sx={{
-                mb: 5,
-                fontWeight: 5,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                mb: 2,
-                width: "100%",
-              }}
-              variant="h6"
-              component="h1"
-              gutterBottom
-            >
+            <Typography variant="h6" component="h1" gutterBottom>
               The generated reports can be viewed on-screen or downloaded for
               archival.
             </Typography>
           </Paper>
-        </card>
+        </Card>
 
         <Card>
-          {/* <Container> */}
           <Paper
             sx={{
               py: 3,
@@ -385,15 +364,17 @@ export default function GlifReports() {
             <Box
               sx={{
                 display: "flex",
+                flexDirection: { xs: "column", md: "row" }, // Stack on mobile
+                gap: 2, // Add gap between items
                 justifyContent: "space-between",
                 borderRadius: 3,
-                padding: "60px",
+                padding: { xs: 2, md: 4 }, // Adjust padding for mobile
                 bgcolor: "#2b5a79ff",
                 boxShadow: 6,
               }}
             >
               {/* Dropdown Menu */}
-              <FormControl sx={{ minWidth: "25%", flexGrow: 0.6 }}>
+              <FormControl sx={{ minWidth: "25%", flexGrow: 1 }}>
                 <InputLabel id="menu-select-label">Select a report</InputLabel>
                 <Select
                   labelId="menu-select-label"
@@ -411,7 +392,7 @@ export default function GlifReports() {
               </FormControl>
 
               {/* Date Picker */}
-              <FormControl sx={{ minWidth: "25%", flexGrow: 0.3 }}>
+              <FormControl sx={{ minWidth: "25%", flexGrow: 1 }}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     label="Select Report Date"
@@ -421,38 +402,35 @@ export default function GlifReports() {
                 </LocalizationProvider>
               </FormControl>
               <Button
-                disabled={!(selectedReport && selectedDate)}
+                disabled={!(selectedReport && selectedDate) || isLoading}
                 sx={{
-                  textAlign: "center",
-                  float: "right",
-                  height: 1,
-                  float: "right",
-                  marginTop: "7px",
+                  height: "56px", // Match input height
+                  flexShrink: 0, // Prevent button from shrinking
                 }}
-                endIcon={<VisibilityRoundedIcon />}
+                endIcon={<VisibilityRounded />}
                 variant="contained"
                 onClick={handleFetchReportData}
               >
-                Fetch Report
+                {isLoading ? "Fetching..." : "Fetch Report"}
               </Button>
             </Box>
 
             <Box
               sx={{
                 mt: 4,
-                justifyContent: "center",
                 display: "flex",
+                alignItems: "center", // Center content vertically
                 border: "1px dashed #6ea9c4ff",
                 p: 2,
                 borderRadius: 3,
-                height: 80,
+                minHeight: 80, // Use minHeight
                 width: "100%",
               }}
             >
               {fileDetails ? (
                 <Grid
                   container
-                  spacing={4}
+                  spacing={2}
                   sx={{ width: "100%", alignItems: "center" }}
                 >
                   <Grid
@@ -470,16 +448,17 @@ export default function GlifReports() {
                       variant="h6"
                       color="text.secondary"
                       fontWeight="600"
+                      sx={{ wordBreak: "break-all" }} // Handle long filenames
                     >
                       {fileDetails.name}
                     </Typography>
                   </Grid>
+
                   <Grid
                     item
                     xs={12}
                     md={6}
                     sx={{
-                      mx: 4,
                       display: "flex",
                       flexDirection: "row",
                       justifyContent: "flex-end",
@@ -487,23 +466,9 @@ export default function GlifReports() {
                       gap: 2,
                     }}
                   >
-                    {/* <IconButton
-                      onClick={handleDownloadReport(objectUrl)}
-                      size="large"
-                      sx={{
-                        color: "text.secondary",
-                        border: "1px solid white",
-                        padding: "7px",
-                        "&:hover": {
-                          backgroundColor: "rgba(255, 255, 255, 0.1)",
-                        },
-                      }}
-                    >
-                      <Download />
-                    </IconButton> */}
-                    
                     {objectUrl && fileDetails && (
                       <IconButton
+                        // Fixed: Call handler with both URL and name
                         onClick={() =>
                           handleDownloadReport(objectUrl, fileDetails.name)
                         }
@@ -537,27 +502,19 @@ export default function GlifReports() {
                     </IconButton>
                   </Grid>
 
-                  {/* New Grid item for the message */}
                   {!isViewable(fileDetails.type) && (
                     <Grid
                       item
                       xs={12}
-                      md={6}
                       sx={{
                         display: "flex",
-                        justifyContent: "flex-end", // Align text to the right
-                        flexGrow: 1, // Takes up remaining space
+                        justifyContent: "flex-end",
+                        pt: 1, // Add some padding top
                       }}
                     >
-                      <Typography
-                        variant="caption"
-                        color="error.light"
-                        sx={{
-                          textAlign: "right", // Ensure the text is aligned to the right
-                        }}
-                      >
-                        Preview is not available for Excel reports, download
-                        directly.
+                      <Typography variant="caption" color="error.light">
+                        Preview is not available for this file type, please
+                        download directly.
                       </Typography>
                     </Grid>
                   )}
@@ -566,43 +523,29 @@ export default function GlifReports() {
                 <Box
                   sx={{
                     display: "flex",
+                    alignItems: "center",
                     width: "100%",
-                    justifyContent: "flex-start",
+                    gap: 2, // Add gap
                   }}
                 >
-                  <Box
-                    sx={{
-                      width: 48,
-                      height: 48,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <ContentPasteOffTwoTone
-                      sx={{ fontSize: 26, color: "text.secondary" }}
-                    />
-                  </Box>
-                  <Typography
-                    variant="body1"
-                    sx={{ alignContent: "center" }}
-                    color="text.secondary"
-                  >
+                  <ContentPasteOffTwoTone
+                    sx={{ fontSize: 26, color: "text.secondary" }}
+                  />
+                  <Typography variant="body1" color="text.secondary">
                     {noReportMessage}
                   </Typography>
                 </Box>
               )}
             </Box>
           </Paper>
-          {/* </Container> */}
         </Card>
       </Stack>
       <ReportDialog
-        name={selectedReport}
         open={isViewing}
         setview={setIsViewing}
         url={objectUrl}
         file={fileDetails}
+        fileName={fileDetails?.name} // Fixed: Pass the correct name
       />
     </Container>
   );
