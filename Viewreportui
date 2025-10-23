@@ -1,409 +1,609 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
-  Container,
+  Paper,
   Typography,
-  Card,
-  CardContent,
-  Select,
-  MenuItem,
   FormControl,
   InputLabel,
+  Select,
+  MenuItem,
+  Stack,
+  Container,
   Button,
+  Card,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Link,
+  CardContent,
   Grid,
-  Paper,
-  CircularProgress,
   Divider,
+  useTheme,
+  IconButton,
 } from "@mui/material";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import DownloadForOfflineTwoToneIcon from "@mui/icons-material/DownloadForOfflineTwoTone";
+import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import useApi from "../../../hooks/useApi";
 import {
-  CalendarToday,
+  ContentPasteOffTwoTone,
   Description,
   Download,
   Visibility,
-  FilterList,
-  TrendingUp,
 } from "@mui/icons-material";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { format } from "date-fns";
+import { PictureAsPdf, InsertDriveFile } from "@mui/icons-material";
 
-// Mock report types - these would come from your backend
-const reportTypes = [
-  { id: "financial", label: "Financial Report" },
-  { id: "operational", label: "Operational Report" },
-  { id: "quarterly", label: "Quarterly Summary" },
-  { id: "annual", label: "Annual Overview" },
-  { id: "compliance", label: "Compliance Report" },
-];
+// --- Helper Functions ---
 
-const Reports = () => {
-  const [selectedReportType, setSelectedReportType] = useState("");
-  const [date, setDate] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [fetchedReport, setFetchedReport] = useState(null);
-
-  const handleFetchReport = async () => {
-    if (!selectedReportType || !date) {
-      alert("Please select both report type and date");
-      return;
-    }
-
-    setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      setFetchedReport({
-        type: reportTypes.find((r) => r.id === selectedReportType)?.label,
-        date: format(date, "PPP"),
-        size: "2.4 MB",
-        pages: 42,
-        generatedAt: new Date().toISOString(),
-      });
-      setIsLoading(false);
-    }, 1500);
-  };
-
-  const handleViewReport = () => {
-    alert("Opening report viewer...");
-    // Implement view logic
-  };
-
-  const handleDownloadReport = () => {
-    alert("Downloading report...");
-    // Implement download logic
-  };
-
+const isViewable = (mimeType) => {
+  if (!mimeType) return false;
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Box sx={{ minHeight: "100vh", bgcolor: "#f5f7fa" }}>
-        {/* Header */}
-        <Paper
-          elevation={2}
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-            bgcolor: "background.paper",
-          }}
-        >
-          <Container maxWidth="xl" sx={{ py: 3 }}>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 56,
-                  height: 56,
-                  borderRadius: 2,
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                }}
-              >
-                <Description sx={{ fontSize: 32, color: "white" }} />
-              </Box>
-              <Box>
-                <Typography variant="h4" fontWeight="bold" color="text.primary">
-                  GLIF Reports
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Generate and manage your reports
-                </Typography>
-              </Box>
-            </Box>
-          </Container>
-        </Paper>
-
-        <Container maxWidth="xl" sx={{ py: 4 }}>
-          {/* Stats Cards */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} md={4}>
-              <Card elevation={2} sx={{ height: "100%" }}>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      mb: 2,
-                    }}
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      Total Reports
-                    </Typography>
-                    <Description sx={{ fontSize: 20, color: "text.secondary" }} />
-                  </Box>
-                  <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
-                    243
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Generated this year
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <Card elevation={2} sx={{ height: "100%" }}>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      mb: 2,
-                    }}
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      This Month
-                    </Typography>
-                    <TrendingUp sx={{ fontSize: 20, color: "success.main" }} />
-                  </Box>
-                  <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
-                    18
-                  </Typography>
-                  <Typography variant="caption" color="success.main">
-                    +12% from last month
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} md={4}>
-              <Card elevation={2} sx={{ height: "100%" }}>
-                <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      mb: 2,
-                    }}
-                  >
-                    <Typography variant="body2" color="text.secondary">
-                      Report Types
-                    </Typography>
-                    <FilterList sx={{ fontSize: 20, color: "text.secondary" }} />
-                  </Box>
-                  <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
-                    {reportTypes.length}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    Available formats
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-
-          {/* Main Report Generator */}
-          <Card elevation={3}>
-            <CardContent sx={{ p: 4 }}>
-              <Typography variant="h5" fontWeight="bold" sx={{ mb: 1 }}>
-                Generate Report
-              </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
-                Select report type and date to fetch your report
-              </Typography>
-
-              <Grid container spacing={3} sx={{ mb: 3 }}>
-                {/* Report Type Selector */}
-                <Grid item xs={12} md={6}>
-                  <FormControl fullWidth>
-                    <InputLabel>Report Type</InputLabel>
-                    <Select
-                      value={selectedReportType}
-                      onChange={(e) => setSelectedReportType(e.target.value)}
-                      label="Report Type"
-                    >
-                      {reportTypes.map((type) => (
-                        <MenuItem key={type.id} value={type.id}>
-                          {type.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-
-                {/* Date Picker */}
-                <Grid item xs={12} md={6}>
-                  <DatePicker
-                    label="Report Date"
-                    value={date}
-                    onChange={(newValue) => setDate(newValue)}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                      },
-                    }}
-                  />
-                </Grid>
-              </Grid>
-
-              {/* Fetch Button */}
-              <Button
-                onClick={handleFetchReport}
-                disabled={isLoading || !selectedReportType || !date}
-                variant="contained"
-                size="large"
-                fullWidth
-                startIcon={
-                  isLoading ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : (
-                    <Description />
-                  )
-                }
-                sx={{
-                  py: 1.5,
-                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                  "&:hover": {
-                    background: "linear-gradient(135deg, #5568d3 0%, #6941a0 100%)",
-                  },
-                }}
-              >
-                {isLoading ? "Fetching Report..." : "Fetch Report"}
-              </Button>
-
-              {/* Report Preview */}
-              {fetchedReport && (
-                <Box sx={{ mt: 4 }}>
-                  <Paper
-                    elevation={0}
-                    sx={{
-                      p: 3,
-                      bgcolor: "grey.50",
-                      border: 1,
-                      borderColor: "divider",
-                    }}
-                  >
-                    <Typography variant="h6" fontWeight="bold" sx={{ mb: 3 }}>
-                      Report Preview
-                    </Typography>
-                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Typography variant="body2" color="text.secondary">
-                          Type:
-                        </Typography>
-                        <Typography variant="body2" fontWeight="medium">
-                          {fetchedReport.type}
-                        </Typography>
-                      </Box>
-                      <Divider />
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Typography variant="body2" color="text.secondary">
-                          Date:
-                        </Typography>
-                        <Typography variant="body2" fontWeight="medium">
-                          {fetchedReport.date}
-                        </Typography>
-                      </Box>
-                      <Divider />
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Typography variant="body2" color="text.secondary">
-                          Size:
-                        </Typography>
-                        <Typography variant="body2" fontWeight="medium">
-                          {fetchedReport.size}
-                        </Typography>
-                      </Box>
-                      <Divider />
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Typography variant="body2" color="text.secondary">
-                          Pages:
-                        </Typography>
-                        <Typography variant="body2" fontWeight="medium">
-                          {fetchedReport.pages}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </Paper>
-
-                  {/* Action Buttons */}
-                  <Grid container spacing={2} sx={{ mt: 2 }}>
-                    <Grid item xs={12} sm={6}>
-                      <Button
-                        onClick={handleViewReport}
-                        variant="outlined"
-                        size="large"
-                        fullWidth
-                        startIcon={<Visibility />}
-                      >
-                        View Report
-                      </Button>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Button
-                        onClick={handleDownloadReport}
-                        variant="contained"
-                        size="large"
-                        fullWidth
-                        startIcon={<Download />}
-                        sx={{
-                          bgcolor: "success.main",
-                          "&:hover": {
-                            bgcolor: "success.dark",
-                          },
-                        }}
-                      >
-                        Download Report
-                      </Button>
-                    </Grid>
-                  </Grid>
-                </Box>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Empty State Hint */}
-          {!fetchedReport && (
-            <Box sx={{ mt: 4, textAlign: "center" }}>
-              <Box
-                sx={{
-                  mx: "auto",
-                  width: 64,
-                  height: 64,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: "50%",
-                  bgcolor: "grey.100",
-                }}
-              >
-                <Description sx={{ fontSize: 32, color: "text.secondary" }} />
-              </Box>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{ mt: 2 }}
-              >
-                No report fetched yet. Select a report type and date to get started.
-              </Typography>
-            </Box>
-          )}
-        </Container>
-      </Box>
-    </LocalizationProvider>
+    mimeType.startsWith("application/pdf") ||
+    mimeType.startsWith("image/") ||
+    mimeType.startsWith("text/")
   );
 };
 
-export default Reports;
+const base64ToBlob = (base64, mimeType) => {
+  const byteCharacters = atob(base64);
+
+  const byteArrays = [];
+  const sliceSize = 512;
+  for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    const slice = byteCharacters.slice(offset, offset + sliceSize);
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+  return new Blob(byteArrays, { type: mimeType });
+};
+
+const getFileIcon = (fileName) => {
+  const extension = fileName.split(".").pop().toLowerCase();
+  switch (extension) {
+    case "pdf":
+      return <PictureAsPdf />;
+    case "xlsx":
+    case "xls":
+      return <Description />;
+    default:
+      return <InsertDriveFile />;
+  }
+};
+
+// --- Viewer Components ---
+
+const PdfViewer = ({ objectUrl, fileName }) => (
+  <iframe
+    src={objectUrl}
+    width="100%"
+    title={fileName}
+    className="w-full h-full border-0"
+  />
+);
+
+const ImageViewer = ({ objectUrl, fileName }) => (
+  <div className="w-full h-full flex items-center justify-center p-4 bg-gray-200">
+    <img
+      src={objectUrl}
+      alt={fileName}
+      className="max-w-full max-h-full object-contain"
+    />
+  </div>
+);
+
+const TextViewer = ({ objectUrl }) => {
+  const [content, setContent] = useState("");
+  useEffect(() => {
+    // We need to read the blob content as text to display it
+    const reader = new FileReader();
+    fetch(objectUrl)
+      .then((res) => res.blob())
+      .then((blob) => {
+        reader.readAsText(blob);
+        reader.onload = () => setContent(reader.result);
+      });
+  }, [objectUrl]);
+
+  return (
+    <pre
+      style={{
+        whiteSpace:
+          "pre-wrap" /* Allows wrapping while preserving whitespace and line breaks */,
+        wordWrap:
+          "break-word" /* Ensures long strings without spaces break to fit the container */,
+        overflowWrap: "break-word" /* Modern equivalent of word-wrap */,
+        overflow: "auto",
+      }}
+    >
+      {content}
+    </pre>
+  );
+};
+
+const renderViewer = (objectUrl, file) => {
+  const mimeType = file?.type;
+  if (mimeType?.startsWith("application/pdf")) {
+    return <PdfViewer objectUrl={objectUrl} fileName={file.name} />;
+  }
+  if (mimeType?.startsWith("image/")) {
+    return <ImageViewer objectUrl={objectUrl} fileName={file.name} />;
+  }
+  if (mimeType?.startsWith("text/")) {
+    return <TextViewer objectUrl={objectUrl} />;
+  }
+  return (
+    <Card>
+      <CardContent>
+        <Typography variant="h5" component="div">
+          Preview Unavailable
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Cant display the content of the file!
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+};
+
+//..........................Report Viewer Dialog.................................//
+const ReportDialog = (props) => {
+  console.log(props);
+
+  return (
+    <Dialog
+      sx={{
+        // Target the Paper component for the dialog box background
+        "& .MuiPaper-root": {
+          backgroundColor: "#7fa0b5",
+        },
+      }}
+      slotProps={{
+        backdrop: {
+          sx: {
+            backgroundColor: "rgba(0, 0, 0, 0.5)", // Darker, more opaque backdrop
+          },
+        },
+      }}
+      maxWidth
+      onClose={() => props.setview(false)}
+      open={props.open}
+    >
+      <DialogTitle>{props.name}</DialogTitle>
+      <DialogContent
+        sx={{ height: "70vh", width: "70vw" }}
+        // sx={{ maxHeight: "80vh", minWidth: "65vw" }}
+      >
+        <Box
+          style={{ flexDirection: "row", flexWrap: "wrap" }}
+          sx={{ mt: 3, mb: 3, height: 1 }}
+        >
+          {renderViewer(props.url, props.file)}
+        </Box>
+      </DialogContent>
+      <DialogActions>
+        {props.url && (
+          <Link href={props.url} download>
+            <Button>Download</Button>
+          </Link>
+        )}
+      </DialogActions>
+    </Dialog>
+  );
+};
+
+//................................................................................//
+
+export default function GlifReports() {
+  const [repTypes, setRepTypes] = useState([]);
+  const [selectedReport, setReport] = useState();
+  const [selectedDate, setDate] = useState(null);
+  const [isViewing, setIsViewing] = useState(false);
+  const [fileDetails, setFileDetais] = useState(null);
+  const [objectUrl, setObjectUrl] = useState(null);
+  const { callApi } = useApi();
+  const [isLoading, setIsLoading] = useState(false);
+  const [noReportMessage, setNoReportMessage] = useState(
+    "No report fetched yet. Select a report type and date to get started."
+  );
+
+  //Getting Reports Types list
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    // This function runs when the component unmounts or when objectUrl changes
+    return () => {
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+  }, [objectUrl]);
+
+  async function fetchData() {
+    setIsLoading(true);
+    const data = await callApi("RS/reports/types", { roleId: 56 }, "POST");
+    setRepTypes(data.data);
+    setIsLoading(false);
+  }
+
+  //setting selected report
+  const handleSelect = (event) => {
+    setReport(event.target.value);
+  };
+
+  //Fetching Report data
+  async function handleFetchReportData() {
+    setIsLoading(true);
+    setObjectUrl(null);
+    setFileDetais(null);
+    setNoReportMessage(null);
+
+    try {
+      const response = await callApi(
+        "RS/reports/download",
+        {
+          fileName: selectedReport,
+          date: selectedDate.format("YYYY-MM-DD"),
+          roleId: 56,
+        },
+        "POST"
+      );
+      if (!response?.success) {
+        if (response?.message) {
+          setNoReportMessage(response.message);
+        } else {
+          // Fallback for generic network errors or unexpected responses
+          setNoReportMessage(
+            "No report file found for the selected type and date."
+          );
+        }
+        return;
+      }
+
+      if (!response.data?.fileContent || !response.data?.fileType) {
+        setNoReportMessage(
+          "No file content or file type was received. Please try again"
+        );
+        return;
+      }
+
+      const blobObject = base64ToBlob(
+        response.data.fileContent,
+        response.data.fileType
+      );
+
+      const newObjectUrl = URL.createObjectURL(blobObject);
+
+      setFileDetais({
+        name: response.data.fileName,
+        type: response.data.fileType,
+      });
+      setObjectUrl(newObjectUrl);
+    } catch (error) {
+      console.error("Failed to fetch report data:", error);
+      setNoReportMessage("Failed to fetch report. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  function handleDownloadReport(url) {
+    const link = document.createElement("a");
+    link.href = url;
+    // link.download = `${file.name}.${name}`;
+    console.log(link.download);
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    // Clean up
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  }
+
+  const handleViewReport = () => {
+    setIsViewing(true);
+  };
+
+  return (
+    <Container maxWidth={false} disableGutters>
+      <Stack spacing={4}>
+        <card>
+          <Paper sx={{ p: 3, width: "100%" }} elevation={3}>
+            {/* <Typography sx={{ mb: 1 ,}} variant="h4" component="h1" gutterBottom>
+            Welcome to GLIF Reporting System
+          </Typography> */}
+            <DownloadForOfflineTwoToneIcon
+              sx={{
+                height: 70,
+                width: 70,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 2,
+                width: "100%",
+              }}
+            />
+            <Typography
+              sx={{
+                mb: 5,
+                fontWeight: 5,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 2,
+                width: "100%",
+              }}
+              variant="h6"
+              component="h1"
+              gutterBottom
+            >
+              Utilize the required report type and date criteria below to
+              precisely define and retrieve the required reports. <br />
+            </Typography>
+            <Typography
+              sx={{
+                mb: 5,
+                fontWeight: 5,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                mb: 2,
+                width: "100%",
+              }}
+              variant="h6"
+              component="h1"
+              gutterBottom
+            >
+              The generated reports can be viewed on-screen or downloaded for
+              archival.
+            </Typography>
+          </Paper>
+        </card>
+
+        <Card>
+          {/* <Container> */}
+          <Paper
+            sx={{
+              py: 3,
+              px: 3,
+              width: "100%",
+              height: "100%",
+              bgcolor: "#054c70ff",
+            }}
+            elevation={2}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                borderRadius: 3,
+                padding: "60px",
+                bgcolor: "#2b5a79ff",
+                boxShadow: 6,
+              }}
+            >
+              {/* Dropdown Menu */}
+              <FormControl sx={{ minWidth: "25%", flexGrow: 0.6 }}>
+                <InputLabel id="menu-select-label">Select a report</InputLabel>
+                <Select
+                  labelId="menu-select-label"
+                  id="menu-select"
+                  value={selectedReport}
+                  label="Select a Report"
+                  onChange={handleSelect}
+                >
+                  {repTypes.map((item) => (
+                    <MenuItem key={item.reportName} value={item.fileName}>
+                      {item.reportName}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {/* Date Picker */}
+              <FormControl sx={{ minWidth: "25%", flexGrow: 0.3 }}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="Select Report Date"
+                    value={selectedDate}
+                    onChange={(newDate) => setDate(newDate)}
+                  />
+                </LocalizationProvider>
+              </FormControl>
+              <Button
+                disabled={!(selectedReport && selectedDate)}
+                sx={{
+                  textAlign: "center",
+                  float: "right",
+                  height: 1,
+                  float: "right",
+                  marginTop: "7px",
+                }}
+                endIcon={<VisibilityRoundedIcon />}
+                variant="contained"
+                onClick={handleFetchReportData}
+              >
+                Fetch Report
+              </Button>
+            </Box>
+
+            <Box
+              sx={{
+                mt: 4,
+                justifyContent: "center",
+                display: "flex",
+                border: "1px dashed #6ea9c4ff",
+                p: 2,
+                borderRadius: 3,
+                height: 80,
+                width: "100%",
+              }}
+            >
+              {fileDetails ? (
+                <Grid
+                  container
+                  spacing={4}
+                  sx={{ width: "100%", alignItems: "center" }}
+                >
+                  <Grid
+                    item
+                    xs={12}
+                    md={6}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                    }}
+                  >
+                    {getFileIcon(fileDetails.name)}
+                    <Typography
+                      variant="h6"
+                      color="text.secondary"
+                      fontWeight="600"
+                    >
+                      {fileDetails.name}
+                    </Typography>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    md={6}
+                    sx={{
+                      mx: 4,
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "flex-end",
+                      alignItems: "center",
+                      gap: 2,
+                    }}
+                  >
+                    {/* <IconButton
+                      onClick={handleDownloadReport(objectUrl)}
+                      size="large"
+                      sx={{
+                        color: "text.secondary",
+                        border: "1px solid white",
+                        padding: "7px",
+                        "&:hover": {
+                          backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        },
+                      }}
+                    >
+                      <Download />
+                    </IconButton> */}
+                    
+                    {objectUrl && fileDetails && (
+                      <IconButton
+                        onClick={() =>
+                          handleDownloadReport(objectUrl, fileDetails.name)
+                        }
+                        size="large"
+                        sx={{
+                          color: "text.secondary",
+                          border: "1px solid white",
+                          padding: "7px",
+                          "&:hover": {
+                            backgroundColor: "rgba(255, 255, 255, 0.1)",
+                          },
+                        }}
+                      >
+                        <Download />
+                      </IconButton>
+                    )}
+                    <IconButton
+                      onClick={() => setIsViewing(true)}
+                      size="large"
+                      disabled={!isViewable(fileDetails.type)}
+                      color="text.secondary"
+                      sx={{
+                        border: "1px solid",
+                        padding: "7px",
+                        "&:hover": {
+                          backgroundColor: "rgba(25, 118, 210, 0.1)",
+                        },
+                      }}
+                    >
+                      <Visibility />
+                    </IconButton>
+                  </Grid>
+
+                  {/* New Grid item for the message */}
+                  {!isViewable(fileDetails.type) && (
+                    <Grid
+                      item
+                      xs={12}
+                      md={6}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "flex-end", // Align text to the right
+                        flexGrow: 1, // Takes up remaining space
+                      }}
+                    >
+                      <Typography
+                        variant="caption"
+                        color="error.light"
+                        sx={{
+                          textAlign: "right", // Ensure the text is aligned to the right
+                        }}
+                      >
+                        Preview is not available for Excel reports, download
+                        directly.
+                      </Typography>
+                    </Grid>
+                  )}
+                </Grid>
+              ) : (
+                <Box
+                  sx={{
+                    display: "flex",
+                    width: "100%",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 48,
+                      height: 48,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <ContentPasteOffTwoTone
+                      sx={{ fontSize: 26, color: "text.secondary" }}
+                    />
+                  </Box>
+                  <Typography
+                    variant="body1"
+                    sx={{ alignContent: "center" }}
+                    color="text.secondary"
+                  >
+                    {noReportMessage}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
+          </Paper>
+          {/* </Container> */}
+        </Card>
+      </Stack>
+      <ReportDialog
+        name={selectedReport}
+        open={isViewing}
+        setview={setIsViewing}
+        url={objectUrl}
+        file={fileDetails}
+      />
+    </Container>
+  );
+}
